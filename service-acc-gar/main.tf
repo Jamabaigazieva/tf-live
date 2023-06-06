@@ -10,18 +10,35 @@ resource "google_service_account" "github_service_account" {
 
 resource "google_project_iam_binding" "github_service_account_binding" {
   project = "glossy-infinity-382611"
-  role    = "roles/iam.serviceAccountAdmin"
+  role    = "roles/iam.serviceAccountTokenCreator"
   members = [
-    "serviceAccount:${google_service_account.github_service_account.email}",
+"serviceAccount:${google_service_account.github_service_account.email}"
   ]
 }
+
+resource "google_project_iam_member" "artifact_registry_member" {
+  project = "glossy-infinity-382611"
+  role    = "roles/artifactregistry.writer"
+  member  = "serviceAccount:${google_service_account.github_service_account.email}"
+}
+
+
 
 resource "google_artifact_registry_repository" "my_repository" {
   project       = "glossy-infinity-382611"
   location      = "us-central1"
   repository_id = "jama-repo-project"
   description   = "jama-repo-project"
-  format        = "DOCKER"  
+  format        = "DOCKER"
+
+}
+
+resource "google_artifact_registry_repository" "my_repository2" {
+  project       = "glossy-infinity-382611"
+  location      = "us-central1"
+  repository_id = "jama-repo-project-helm"
+  description   = "jama-repo-project-helm"
+  format        = "DOCKER"
 
 }
 
@@ -32,3 +49,4 @@ output "repository_name" {
 output "service_account_email" {
   value = google_service_account.github_service_account.email
 }
+
